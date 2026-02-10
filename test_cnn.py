@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from collections import deque, Counter
 import mediapipe as mp
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 
 IMG_SIZE = 128
 SMOOTHING_FRAMES = 8
