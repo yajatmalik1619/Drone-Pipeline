@@ -59,8 +59,8 @@ while cap.isOpened():
             gray = cv2.cvtColor(hand_img, cv2.COLOR_BGR2GRAY)
             gray = gray.astype("float32") / 255.0
 
-            gray = np.expand_dims(gray, axis=-1)
-            gray = np.expand_dims(gray, axis=0)
+            gray = np.stack([gray, gray, gray], axis=-1) 
+            gray = np.expand_dims(gray, axis=0)          
 
             preds = model.predict(gray, verbose=0)
             idx = np.argmax(preds)
@@ -91,7 +91,7 @@ while cap.isOpened():
 
     cv2.imshow("CNN + MediaPipe Hand Detection", frame)
 
-    if cv2.waitKey(1) & 0xFF == 27:
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cap.release()

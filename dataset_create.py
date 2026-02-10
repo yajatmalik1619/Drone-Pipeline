@@ -168,7 +168,7 @@ while cap.isOpened():
             cv2.imwrite(path, img)
             print("saved:", path)
 
-    if key == 27:
+    if key == ord('q'):
         break
 
 cap.release()
