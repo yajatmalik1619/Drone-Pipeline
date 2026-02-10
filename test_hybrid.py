@@ -9,11 +9,11 @@ from keras.models import load_model
 IMG_SIZE = 128
 SMOOTHING_FRAMES = 8
 
-STATIC_GESTURES = ["fist", "palm", "peace", "thumbs_up"]
+STATIC_GESTURES = ["fist", "palm", "peace", "thumbs_up", "up", "down", "right", "left"]
 
-model = load_model("C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\gesture_cnn.h5")
+model = load_model("C:\\Users\\yajat\\Code\\drone_pipeline\\gesture_cnn.h5")
 
-with open("C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\classes.txt", "r") as f:
+with open("C:\\Users\\yajat\\Code\\drone_pipeline\\classes.txt", "r") as f:
     class_names = [line.strip() for line in f.readlines()]
 
 pred_buffer = deque(maxlen=SMOOTHING_FRAMES)

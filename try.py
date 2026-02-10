@@ -5,3 +5,8 @@ print(dir(mp))
 # "C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\dataset"
 # "C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\gesture_cnn.h5"
 # "C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\classes.txt"
+
+# "C:\\Users\\yajat\\Code\\drone_pipeline\\dataset"
+# "C:\\Users\\yajat\\Code\\drone_pipeline\\hand_landmarker.task"
+# "C:\\Users\\yajat\\Code\\drone_pipeline\\gesture_cnn.h5"
+# "C:\\Users\\yajat\\Code\\drone_pipeline\\classes.txt"

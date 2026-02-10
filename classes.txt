@@ -1,4 +1,8 @@
+down
 fist
+left
 palm
 peace
+right
 thumbs_up
+up
