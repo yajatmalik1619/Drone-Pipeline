@@ -42,45 +42,48 @@ data_augmentation = tf.keras.Sequential([
     layers.RandomZoom(0.1),
 ])
 
-base_model = tf.keras.applications.MobileNetV2(
-    input_shape=(IMG_SIZE, IMG_SIZE, 3),
-    include_top=False,
-    weights="imagenet"
-)
+# base_model = tf.keras.applications.MobileNetV2(
+#     input_shape=(IMG_SIZE, IMG_SIZE, 3),
+#     include_top=False,
+#     weights="imagenet"
+# )
 
-base_model.trainable = False
-
-model = models.Sequential([
-    base_model,
-    layers.GlobalAveragePooling2D(),
-    layers.BatchNormalization(),
-
-    layers.Dense(128, activation="relu"),
-    layers.Dropout(0.5),
-
-    layers.Dense(num_classes, activation="softmax")
-])
+# base_model.trainable = False
 
 # model = models.Sequential([
-#     layers.Input(shape=(128, 128, 3)),
-#     layers.Rescaling(1./255),
-
-    #layers.Conv2D(32, 3, padding="same", activation="relu"),
-#     layers.MaxPooling2D(),
-
-#     layers.Conv2D(64, 3, padding="same", activation="relu"),
-#     layers.MaxPooling2D(),
-
-#     layers.Conv2D(128, 3, padding="same", activation="relu"),
-   # layers.MaxPooling2D(),
-
+#     base_model,
 #     layers.GlobalAveragePooling2D(),
+#     layers.BatchNormalization(),
 
 #     layers.Dense(128, activation="relu"),
 #     layers.Dropout(0.5),
 
 #     layers.Dense(num_classes, activation="softmax")
 # ])
+
+model = models.Sequential([
+    layers.Input(shape=(128, 128, 3)),
+    layers.Rescaling(1./255),
+
+    layers.Conv2D(32, 3, padding="same", activation="relu"),
+    layers.MaxPooling2D(),
+    layers.Dropout(0.3),
+
+    layers.Conv2D(128, 3, padding="same", activation="relu"),
+    layers.MaxPooling2D(),
+    layers.Dropout(0.3),
+
+    layers.Conv2D(256, 3, padding="same", activation="relu"),
+    layers.MaxPooling2D(),
+    layers.Dropout(0.3),
+
+    layers.GlobalAveragePooling2D(),
+
+    layers.Dense(32, activation="relu"),
+    layers.Dropout(0.5),
+
+    layers.Dense(num_classes, activation="softmax")
+])
 
 
 model.compile(
