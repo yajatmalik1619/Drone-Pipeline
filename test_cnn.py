@@ -8,9 +8,9 @@ IMG_SIZE = 128
 SMOOTHING_FRAMES = 8
 CONF_THRESHOLD = 0.6
 
-model = load_model("C:/Users/yajat/Code/drone_pipeline/gesture_cnn.h5")
+model = load_model("C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\gesture_cnn.h5")
 
-with open("C:/Users/yajat/Code/drone_pipeline/classes.txt", "r") as f:
+with open("C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\classes.txt", "r") as f:
     class_names = [line.strip() for line in f.readlines()]
 
 pred_buffer = deque(maxlen=SMOOTHING_FRAMES)
@@ -57,9 +57,9 @@ while cap.isOpened():
             hand_img = cv2.resize(hand_img, (IMG_SIZE, IMG_SIZE))
 
             gray = cv2.cvtColor(hand_img, cv2.COLOR_BGR2GRAY)
-            gray = gray.astype("float32") / 255.0
+            #gray = gray.astype("float32") / 255.0
 
-            gray = np.stack([gray, gray, gray], axis=-1) 
+            #gray = np.stack([gray, gray, gray], axis=-1) 
             gray = np.expand_dims(gray, axis=0)          
 
             preds = model.predict(gray, verbose=0)

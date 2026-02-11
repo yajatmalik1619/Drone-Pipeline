@@ -7,7 +7,7 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
-DATASET_DIR = "C:\\Users\\yajat\\Code\\drone_pipeline\\dataset"
+DATASET_DIR = "C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\dataset"
 
 gesture_buffer = deque(maxlen=10)
 last_confirmed = None
@@ -93,7 +93,7 @@ def crop_hand(frame, lm, pad=30):
     return frame[y1:y2, x1:x2]
 
 base_options = python.BaseOptions(
-    model_asset_path= "C:\\Users\\yajat\\Code\\drone_pipeline\\hand_landmarker.task"
+    model_asset_path= "C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\hand_landmarker.task"
 )
 
 options = vision.HandLandmarkerOptions(

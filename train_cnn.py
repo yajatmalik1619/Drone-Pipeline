@@ -2,7 +2,7 @@ import tensorflow as tf
 from keras import layers, models
 import pathlib
 
-DATASET_DIR = pathlib.Path("C:/Users/yajat/Code/drone_pipeline/dataset_grayscale")
+DATASET_DIR = pathlib.Path("C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\dataset_grayscale")
 IMG_SIZE = 128
 BATCH_SIZE = 32
 EPOCHS = 20
@@ -14,7 +14,8 @@ train_ds = tf.keras.utils.image_dataset_from_directory(
     subset="training",
     seed=SEED,
     image_size=(IMG_SIZE, IMG_SIZE),
-    batch_size=BATCH_SIZE
+    batch_size=BATCH_SIZE,
+    color_mode="grayscale"
 )
 
 val_ds = tf.keras.utils.image_dataset_from_directory(
@@ -23,8 +24,10 @@ val_ds = tf.keras.utils.image_dataset_from_directory(
     subset="validation",
     seed=SEED,
     image_size=(IMG_SIZE, IMG_SIZE),
-    batch_size=BATCH_SIZE
+    batch_size=BATCH_SIZE,
+    color_mode="grayscale"
 )
+
 
 class_names = train_ds.class_names
 num_classes = len(class_names)
@@ -61,50 +64,68 @@ data_augmentation = tf.keras.Sequential([
 #     layers.Dense(num_classes, activation="softmax")
 # ])
 
-model = models.Sequential([
-    layers.Input(shape=(128, 128, 3)),
+model = tf.keras.Sequential([
+    layers.Input(shape=(128, 128, 1)),
+    data_augmentation,
     layers.Rescaling(1./255),
 
-    layers.Conv2D(32, 3, padding="same", activation="relu"),
+    layers.Conv2D(32, 3, padding="same"),
+    layers.BatchNormalization(),
+    layers.Activation("relu"),
+    layers.Conv2D(32, 3, padding="same"),
+    layers.BatchNormalization(),
+    layers.Activation("relu"),
     layers.MaxPooling2D(),
-    layers.Dropout(0.3),
 
-    layers.Conv2D(128, 3, padding="same", activation="relu"),
+    layers.Conv2D(64, 3, padding="same"),
+    layers.BatchNormalization(),
+    layers.Activation("relu"),
+    layers.Conv2D(64, 3, padding="same"),
+    layers.BatchNormalization(),
+    layers.Activation("relu"),
     layers.MaxPooling2D(),
-    layers.Dropout(0.3),
 
-    layers.Conv2D(256, 3, padding="same", activation="relu"),
+    layers.Conv2D(128, 3, padding="same"),
+    layers.BatchNormalization(),
+    layers.Activation("relu"),
+    layers.Conv2D(128, 3, padding="same"),
+    layers.BatchNormalization(),
+    layers.Activation("relu"),
     layers.MaxPooling2D(),
-    layers.Dropout(0.3),
 
     layers.GlobalAveragePooling2D(),
 
-    layers.Dense(32, activation="relu"),
-    layers.Dropout(0.5),
+    layers.Dense(256, activation="relu"),
+    layers.Dropout(0.3),
 
     layers.Dense(num_classes, activation="softmax")
 ])
 
-
 model.compile(
-    optimizer="adam",
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.0005),
     loss="sparse_categorical_crossentropy",
     metrics=["accuracy"]
 )
 
-model.summary()
+callbacks = [
+    tf.keras.callbacks.EarlyStopping(
+        patience=6,
+        restore_best_weights=True
+    )
+]
 
 history = model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=EPOCHS
+    epochs=40,
+    callbacks=callbacks
 )
 
 loss, acc = model.evaluate(val_ds)
 print("Validation accuracy:", acc)
 
-model.save("C:/Users/yajat/Code/drone_pipeline/gesture_cnn.h5")
+model.save("C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\gesture_cnn.h5")
 
-with open("C:/Users/yajat/Code/drone_pipeline/classes.txt", "w") as f:
+with open("C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\classes.txt", "w") as f:
     for c in class_names:
         f.write(c + "\n")
