@@ -102,8 +102,8 @@ while cap.isOpened():
 
             if hand_img.size != 0:
                 img = cv2.resize(hand_img, (IMG_SIZE, IMG_SIZE))
-                img = img.astype("float32") / 255.0
-                img = np.expand_dims(img, axis=0)
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                gray = np.expand_dims(img, axis=0)
 
                 preds = model.predict(img, verbose=0)
                 idx = np.argmax(preds)

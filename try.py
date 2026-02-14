@@ -10,3 +10,9 @@ print(dir(mp))
 # "C:\\Users\\yajat\\Code\\drone_pipeline\\hand_landmarker.task"
 # "C:\\Users\\yajat\\Code\\drone_pipeline\\gesture_cnn.h5"
 # "C:\\Users\\yajat\\Code\\drone_pipeline\\classes.txt"
+
+# "C:\\Users\\yajat\\Code\\drone_pipeline\\dataset_grayscale"
+# "C:\\Users\\yajat\\Code\\drone_pipeline\\dataset_mask"
+
+INPUT_DIR = "C:\\Users\\yajat\\Code\\drone_pipeline\\dataset_grayscale"
+OUTPUT_DIR = "C:\\Users\\yajat\\Code\\drone_pipeline\\dataset_mask"
