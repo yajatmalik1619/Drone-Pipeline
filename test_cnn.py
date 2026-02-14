@@ -8,9 +8,9 @@ IMG_SIZE = 128
 SMOOTHING_FRAMES = 8
 CONF_THRESHOLD = 0.6
 
-model = load_model("C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\gesture_cnn.h5")
+model = load_model("C:\\Users\\yajat\\Code\\drone_pipeline\\gesture_cnn.h5")
 
-with open("C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\classes.txt", "r") as f:
+with open("C:\\Users\\yajat\\Code\\drone_pipeline\\classes.txt", "r") as f:
     class_names = [line.strip() for line in f.readlines()]
 
 pred_buffer = deque(maxlen=SMOOTHING_FRAMES)
@@ -89,7 +89,7 @@ while cap.isOpened():
         2
     )
 
-    cv2.imshow("CNN + MediaPipe Hand Detection", frame)
+    cv2.imshow("CNN HAND DETECTION", frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
