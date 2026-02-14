@@ -1,8 +1,8 @@
 import cv2
 import os
 
-directory = "C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\dataset"
-directory_gs = "C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\dataset_grayscale"
+directory = "dataset"
+directory_gs = "dataset_grayscale"
 
 for root, dirs, files in os.walk(directory):
     rel_path = os.path.relpath(root, directory)

@@ -8,7 +8,7 @@ from mediapipe.tasks.python import vision
 
 GESTURES = ["up", "down", "left", "right", "peace", "palm", "fist", "thumbs_up"]
 SEQ_LEN = 30
-SAVE_PATH = "C:\\Users\\yajat\\Code\\drone_pipeline\\dataset_distance"
+SAVE_PATH = "dataset_distance"
 
 for g in GESTURES:
     os.makedirs(os.path.join(SAVE_PATH, g), exist_ok=True)
@@ -32,7 +32,7 @@ def extract_features(lm):
     return np.array(features)
 
 base_options = python.BaseOptions(
-    model_asset_path="C:\\Users\\yajat\\Code\\drone_pipeline\\hand_landmarker.task"
+    model_asset_path="hand_landmarker.task"
 )
 
 options = vision.HandLandmarkerOptions(

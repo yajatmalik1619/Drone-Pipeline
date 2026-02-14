@@ -9,29 +9,16 @@ class GestureSequence:
     """Class to manage gesture sequences"""
     def __init__(self, max_sequence_length=5, timeout=3.0):
         self.max_length = max_sequence_length
-        self.timeout = timeout  # seconds
+        self.timeout = timeout 
         self.sequences = {
             'left': deque(maxlen=max_sequence_length),
             'right': deque(maxlen=max_sequence_length),
-            'both': deque(maxlen=max_sequence_length)  # For two-hand gestures
+            'both': deque(maxlen=max_sequence_length) 
         }
         self.timestamps = {
             'left': deque(maxlen=max_sequence_length),
             'right': deque(maxlen=max_sequence_length),
             'both': deque(maxlen=max_sequence_length)
-        }
-        
-        # Define gesture sequences to recognize
-        self.patterns = {
-            'UNLOCK': ['FIST', 'PEACE', 'OK'],
-            'SELECT': ['PALM', 'FIST'],
-            'ZOOM_IN': ['PEACE', 'PALM'],
-            'ZOOM_OUT': ['PALM', 'PEACE'],
-            'SWIPE_COMBO': ['SWIPE_LEFT', 'SWIPE_RIGHT'],
-            'WAVE_HELLO': ['WAVE', 'PALM'],
-            'THUMBS_COMBO': ['THUMBS_UP', 'THUMBS_UP'],  # Both hands
-            'PEACE_COMBO': ['PEACE', 'PEACE'],  # Both hands
-            'HIGH_FIVE': ['PALM', 'PALM'],  # Both hands together
         }
         
         self.last_match = None
@@ -40,16 +27,12 @@ class GestureSequence:
     def add_gesture(self, hand_type, gesture):
         """Add a gesture to the sequence"""
         current_time = time.time()
-        
-        # Clean old gestures based on timeout
+
         self._clean_old_gestures(hand_type, current_time)
-        
-        # Don't add repeated gestures
         if (len(self.sequences[hand_type]) > 0 and 
             self.sequences[hand_type][-1] == gesture):
             return
-        
-        # Add new gesture
+
         self.sequences[hand_type].append(gesture)
         self.timestamps[hand_type].append(current_time)
     
@@ -57,11 +40,9 @@ class GestureSequence:
         """Add a two-hand gesture combination"""
         current_time = time.time()
         combined = f"{left_gesture}+{right_gesture}"
-        
-        # Clean old gestures
+
         self._clean_old_gestures('both', current_time)
-        
-        # Add combined gesture
+
         if (len(self.sequences['both']) == 0 or 
             self.sequences['both'][-1] != combined):
             self.sequences['both'].append(combined)
@@ -78,33 +59,28 @@ class GestureSequence:
         """Check if current sequences match any defined patterns"""
         matches = []
         
-        # Check single hand patterns
         for hand_type in ['left', 'right']:
             sequence = list(self.sequences[hand_type])
             for pattern_name, pattern in self.patterns.items():
                 if self._matches_pattern(sequence, pattern):
                     matches.append((pattern_name, hand_type.upper()))
         
-        # Check two-hand patterns
         both_sequence = list(self.sequences['both'])
         for pattern_name, pattern in self.patterns.items():
-            # Check if it's a two-hand pattern
             if '+' in str(pattern) or pattern_name.endswith('_COMBO') or pattern_name == 'HIGH_FIVE':
-                # Convert pattern to two-hand format
                 two_hand_pattern = [f"{p}+{p}" for p in pattern] if pattern_name.endswith('_COMBO') else pattern
                 if self._matches_pattern(both_sequence, two_hand_pattern):
                     matches.append((pattern_name, 'BOTH'))
         
         if matches:
-            return matches[0]  # Return first match
+            return matches[0]  
         return None
     
     def _matches_pattern(self, sequence, pattern):
         """Check if sequence ends with pattern"""
         if len(sequence) < len(pattern):
             return False
-        
-        # Check if the last N gestures match the pattern
+
         return sequence[-len(pattern):] == pattern
     
     def get_current_sequence(self, hand_type='left'):
@@ -120,15 +96,12 @@ class GestureSequence:
             for ht in ['left', 'right', 'both']:
                 self.sequences[ht].clear()
                 self.timestamps[ht].clear()
-
-
 class TwoHandGestureDetector:
     def __init__(self):
-        # Initialize MediaPipe Hands for TWO hands
         self.mp_hands = mp.solutions.hands
         self.hands = self.mp_hands.Hands(
             static_image_mode=False,
-            max_num_hands=2,  # Changed to 2 hands
+            max_num_hands=2,  
             min_detection_confidence=0.8,
             min_tracking_confidence=0.7,
             model_complexity=1
@@ -142,11 +115,9 @@ class TwoHandGestureDetector:
         self.right_position_history = deque(maxlen=25)
         self.left_dynamic_buffer = deque(maxlen=5)
         self.right_dynamic_buffer = deque(maxlen=5)
-        
-        # Gesture sequence tracker
+
         self.sequence_tracker = GestureSequence()
-        
-        # Landmark indices
+
         self.WRIST = 0
         self.THUMB_CMC = 1
         self.THUMB_MCP = 2
@@ -169,6 +140,15 @@ class TwoHandGestureDetector:
         self.PINKY_DIP = 19
         self.PINKY_TIP = 20
         
+        self.patterns = {
+            'UNLOCK': ['PEACE', 'OK'],
+            'SELECT': ['PALM', 'FIST'],
+            'ZOOM_IN': ['PEACE', 'PALM'],
+            'ZOOM_OUT': ['PALM', 'PEACE'],
+            'THUMBS_COMBO': ['THUMBS_UP', 'THUMBS_UP'],  
+            'PEACE_COMBO': ['PEACE', 'PEACE'], 
+            'HIGH_FIVE': ['PALM', 'PALM'],  
+        }
     def calculate_distance(self, point1, point2):
         """Calculate 3D Euclidean distance between two points"""
         return math.sqrt(
@@ -355,6 +335,24 @@ class TwoHandGestureDetector:
         
         return gesture
     
+    def detect_two_hand_combo(self, hand_data):
+        left_gesture = hand_data['Left']['gesture']
+        right_gesture = hand_data['Right']['gesture']
+        
+        # Both hands must have valid gestures
+        if not left_gesture or not right_gesture:
+            return None
+        
+        if left_gesture in ['UNKNOWN', 'NO_HAND'] or right_gesture in ['UNKNOWN', 'NO_HAND']:
+            return None
+        
+        # Check against patterns (assuming patterns are tuples now)
+        for pattern_name, (left_pattern, right_pattern) in self.patterns.items():
+            if left_gesture == left_pattern and right_gesture == right_pattern:
+                return pattern_name
+    
+        return None
+
     def process_frame(self, frame):
         """Process frame and detect gestures for both hands"""
         frame = cv2.flip(frame, 1)
@@ -445,18 +443,8 @@ class TwoHandGestureDetector:
             self.right_gesture_buffer.clear()
             self.left_dynamic_buffer.clear()
             self.right_dynamic_buffer.clear()
-        
-        # Check for two-hand gestures
-        if hand_data['Left']['gesture'] and hand_data['Right']['gesture']:
-            self.sequence_tracker.add_two_hand_gesture(
-                hand_data['Left']['gesture'],
-                hand_data['Right']['gesture']
-            )
-        
-        # Check for sequence matches
-        sequence_match = self.sequence_tracker.check_patterns()
-        
-        # Display information
+
+        sequence_match = self.detect_two_hand_combo(hand_data)
         self._draw_ui(frame, hand_data, sequence_match)
         
         return frame, hand_data, sequence_match
@@ -465,7 +453,6 @@ class TwoHandGestureDetector:
         """Draw UI overlay with hand information and sequences"""
         h, w, _ = frame.shape
         
-        # Left hand info (top-left)
         cv2.rectangle(frame, (5, 5), (350, 150), (0, 0, 0), -1)
         cv2.rectangle(frame, (5, 5), (350, 150), (0, 255, 0), 2)
         cv2.putText(frame, "LEFT HAND", (15, 25),
@@ -484,15 +471,13 @@ class TwoHandGestureDetector:
         if hand_data['Left']['dynamic']:
             cv2.putText(frame, f"Dynamic: {hand_data['Left']['dynamic']}", (15, 105),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 200, 255), 1)
-        
-        # Show left sequence
+
         left_seq = self.sequence_tracker.get_current_sequence('left')
         if left_seq:
             seq_text = " > ".join(left_seq[-3:])  
             cv2.putText(frame, f"Seq: {seq_text}", (15, 130),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 150, 255), 1)
-        
-        # Right hand info (top-right)
+
         cv2.rectangle(frame, (w-355, 5), (w-5, 150), (0, 0, 0), -1)
         cv2.rectangle(frame, (w-355, 5), (w-5, 150), (255, 0, 0), 2)
         cv2.putText(frame, "RIGHT HAND", (w-345, 25),
@@ -511,8 +496,7 @@ class TwoHandGestureDetector:
         if hand_data['Right']['dynamic']:
             cv2.putText(frame, f"Dynamic: {hand_data['Right']['dynamic']}", (w-345, 105),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 200, 255), 1)
-        
-        # Show right sequence
+
         right_seq = self.sequence_tracker.get_current_sequence('right')
         if right_seq:
             seq_text = " > ".join(right_seq[-3:])
@@ -526,8 +510,17 @@ class TwoHandGestureDetector:
         text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)[0]
         text_x = (w - text_size[0]) // 2
         cv2.putText(frame, text, (text_x, 30),
-           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)  
         
+        cv2.rectangle(frame, (w//2 - 275, 55), (w//2 + 275, 100), (0, 0, 0), -1)
+        cv2.rectangle(frame, (w//2 - 275, 55), (w//2 + 275, 100), (255, 255, 255), 2)
+        if sequence_match:
+            text = f"COMBO: {sequence_match}"
+            text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)[0]
+            text_x = (w - text_size[0]) // 2
+            cv2.putText(frame, text, (text_x, 80),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)  
+
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)

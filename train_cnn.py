@@ -2,7 +2,7 @@ import tensorflow as tf
 from keras import layers, models
 import pathlib
 
-DATASET_DIR = pathlib.Path("C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\dataset_grayscale")
+DATASET_DIR = pathlib.Path("dataset_grayscale")
 IMG_SIZE = 128
 BATCH_SIZE = 32
 EPOCHS = 20
@@ -28,7 +28,6 @@ val_ds = tf.keras.utils.image_dataset_from_directory(
     color_mode="grayscale"
 )
 
-
 class_names = train_ds.class_names
 num_classes = len(class_names)
 
@@ -44,25 +43,6 @@ data_augmentation = tf.keras.Sequential([
     layers.RandomRotation(0.1),
     layers.RandomZoom(0.1),
 ])
-
-# base_model = tf.keras.applications.MobileNetV2(
-#     input_shape=(IMG_SIZE, IMG_SIZE, 3),
-#     include_top=False,
-#     weights="imagenet"
-# )
-
-# base_model.trainable = False
-
-# model = models.Sequential([
-#     base_model,
-#     layers.GlobalAveragePooling2D(),
-#     layers.BatchNormalization(),
-
-#     layers.Dense(128, activation="relu"),
-#     layers.Dropout(0.5),
-
-#     layers.Dense(num_classes, activation="softmax")
-# ])
 
 model = tf.keras.Sequential([
     layers.Input(shape=(128, 128, 1)),
@@ -124,8 +104,8 @@ history = model.fit(
 loss, acc = model.evaluate(val_ds)
 print("Validation accuracy:", acc)
 
-model.save("C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\gesture_cnn.h5")
+model.save("gesture_cnn.h5")
 
-with open("C:\\Users\\Kanishka\\Code\\Drone-Pipeline\\classes.txt", "w") as f:
+with open("classes.txt", "w") as f:
     for c in class_names:
         f.write(c + "\n")

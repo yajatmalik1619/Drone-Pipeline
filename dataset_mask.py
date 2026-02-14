@@ -3,8 +3,8 @@ import mediapipe as mp
 import numpy as np
 import os
 
-INPUT_DIR = "C:\\Users\\yajat\\Code\\drone_pipeline\\dataset_grayscale"
-OUTPUT_DIR = "C:\\Users\\yajat\\Code\\drone_pipeline\\dataset_mask"
+INPUT_DIR = "dataset_grayscale"
+OUTPUT_DIR = "dataset_mask"
 
 IMG_SIZE = 128
 
